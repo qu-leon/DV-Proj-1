@@ -67,16 +67,37 @@
 
 <body>
 
-    <div id="thevizcolumn" style="width:100%; height:2160px; float: left; background-color:rgb(90, 119, 163);">
-      <p><b><center><font face="Helvetica">1854 London Cholera Outbreak Data</font></center></b></p>
+    <div id="thevizcolumn" style="width:100%; height:2260px; float: left; background-color:rgb(90, 119, 163);">
+    <p><b><center><font face="Helvetica">1854 London Cholera Outbreak Data</font></center></b></p>
       <div style="width:50%; height:400px; float: left">
-      <div id="plot1" style="width:100%;height:400px;" ></div>
-      </div>
+        <div id="plot1" style="width:100%;height:400px;" ></div>
+        </div>
       <div style="width:50%; height:400px; float: left">
-      <div id="chart1" style="width:100%;height:400px;" ></div>
-      </div>
-      <div style="width:50%; height:400px; float: left">
+        <div id="chart1" style="width:100%;height:400px;" ></div>
+        </div>
+      <div style="width:50%; height:400px; float: left; margin-top:40px">
         <div id="plot2" style="width:100%;height:400px;" ></div>
+        </div>
+      <div style="width:50%; height:400px; float: left; margin-top:40px">
+        <div id="chart2" style="width:100%;height:400px;"></div>
+        </div>
+      <div style="width:50%; height:400px; float: left; margin-top:40px">
+        <div id="plot3" style="width:100%;height:400px;" ></div>
+        </div>
+      <div style="width:50%; height:400px; float: left; margin-top:40px">
+        <div id="chart3" style="width:100%;height:400px;"></div>
+        </div> 
+     <div style="width:50%; height:400px; float: left; margin-top:40px">
+       <div id="plot4" style="width:100%;height:400px;" ></div>
+       </div>
+     <div style="width:50%; height:400px; float: left; margin-top:40px">
+        <div id="plot5" style="width:100%;height:400px;" ></div>
+        </div>
+      <div style="width:50%; height:400px; float: left; margin-top:40px">
+        <div id="plot6" style="width:100%;height:400px;" ></div>
+        </div>
+      <div style="width:50%; height:400px; float: left; margin-top:40px">
+         <div id="plot7" style="width:100%;height:400px;" ></div>
         </div>
     </div>
 
@@ -95,7 +116,7 @@
     return rows.map(function(row) { return row[key]; });
     }
 
-    var headerNames = Plotly.d3.keys(rows[0]);
+  var headerNames = Plotly.d3.keys(rows[0]);
 
   var headerValues = [];
   var cellValues = [];
@@ -132,15 +153,15 @@
   }
   }]
 
-  var sumOfAttacks = [Plotly.d3.sum(data.map(function(d){return d.Attack}))];
-  var sumOfDeaths = [Plotly.d3.sum(data.map(function(d){return d.Death}))];
-
   var layout1 = {
   title: "Cholera Attacks and Deaths by Date"
   }
 
-  var table1 = Plotly.plot('chart1', data1, layout1);
-
+  Plotly.plot('chart1', data1, layout1);
+/*
+  var sumOfAttacks = [Plotly.d3.sum(data.map(function(d){return d.Attack}))];
+  var sumOfDeaths = [Plotly.d3.sum(data.map(function(d){return d.Death}))];
+*/
     var trace1 = {
         x: unpack(rows, 'Date'),
         y: unpack(rows, 'Attack'),
@@ -162,39 +183,236 @@
           width: 3
         }
     };
-  
+
     var trace3 = {
         x: unpack(rows, 'Date'),
-        y: sumOfAttacks,
-        mode: 'markers',
-        name: 'Total # of attacks up to day'
+        y: unpack(rows, 'Attack'),
+        mode: 'lines+markers',
+        name: 'Total # of attacks up to day',
+        transforms: [{
+          type: 'aggregate',
+          groups: unpack(rows, 'Date'),
+          aggregations: [
+            {target: 'y', func: 'sum', enabled: true},
+          ]
+        }]
     };
 
     var trace4 = {
       x: unpack(rows, 'Date'),
-      y: sumOfDeaths,
-      mode: 'markers',
-      name: 'Total # of deaths up to day'
+      y: unpack(rows, 'Death'),
+      mode: 'lines+markers',
+      name: 'Total # of deaths up to day',
+      transforms: [{
+          type: 'aggregate',
+          groups: unpack(rows, 'Date'),
+          aggregations: [
+            {target: 'y', func: 'sum', enabled: true},
+          ]
+        }]
     };
   
     var data = [trace1, trace2, trace3, trace4];
   
     var layout = {
-        title: 'Cholera Attacks and Deaths',
-        xaxis: {
+        title: 'Cholera Attacks and Deaths in 1854',
+      /*  xaxis: {
         title: 'Dates'
-    },
-      yaxis: {
+      },*/
+        yaxis: {
         title: 'Number of People'
       }
     };
   
-  var graph1 = Plotly.newPlot('plot1', data, layout);
+  Plotly.newPlot('plot1', data, layout);
+});
+
+Plotly.d3.tsv("https://raw.githubusercontent.com/ungarz/cholera/master/naplesCholeraAgeSexData.tsv", 
+    function(err, rows){
+      function unpack(rows, key) {
+    return rows.map(function(row) { return row[key]; });
+    }
+
+    var headerNames = Plotly.d3.keys(rows[0]);
+
+var headerValues = [];
+var cellValues = [];
+for (i = 0; i < headerNames.length; i++) {
+  headerValue = [headerNames[i]];
+  headerValues[i] = headerValue;
+  cellValue = unpack(rows, headerNames[i]);
+  cellValues[i] = cellValue;
+}
+
+var data2 = [{
+type: 'table',
+columnwidth: [500,500,500],
+columnorder: [0,1,2],
+header: {
+  values: headerValues,
+  align: "center",
+  line: {width: 1, color: 'rgb(50, 50, 50)'},
+  fill: {color: ['rgb(235, 100, 230)']},
+  font: {family: "Arial", size: 11, color: "white"}
+},
+cells: {
+  values: cellValues,
+  align: ["center","center", "center"],
+  line: {color: "black", width: 1},
+  fill: {color: ['rgba(228, 222, 249, 0.65)','rgb(235, 193, 238)', 'rgba(228, 222, 249, 0.65)']},
+  font: {family: "Arial", size: 11, color: ["black"]}
+}
+}];
+
+var layout2 = {
+title: "Fatalities in Different Age Groups"
+};
+
+Plotly.plot('chart2', data2, layout2);
+
+var trace1 = {
+        x: unpack(rows, 'age'),
+        y: unpack(rows, 'male'),
+        name: 'Male fatalities',
+        type: 'bar'
+    };
+  
+  var trace2 = {
+        x: unpack(rows, 'age'),
+        y: unpack(rows, 'female'),
+        name: 'Female fatalities',
+        type: 'bar'
+  };
+
+  var data = [trace1, trace2];
+  var layout = {barmode: 'group',
+    title: "Fatalities of Different Age Groups in Men & Women"};
+
+  Plotly.newPlot('plot2', data, layout);
+  });
+
+  Plotly.d3.csv("https://raw.githubusercontent.com/ungarz/cholera/master/UKcensus1851.csv", 
+    function(err, rows){
+      function unpack(rows, key) {
+    return rows.map(function(row) { return row[key]; });
+    }
+
+    var headerNames = Plotly.d3.keys(rows[0]);
+
+var headerValues = [];
+var cellValues = [];
+for (i = 0; i < headerNames.length; i++) {
+  headerValue = [headerNames[i]];
+  headerValues[i] = headerValue;
+  cellValue = unpack(rows, headerNames[i]);
+  cellValues[i] = cellValue;
+};
+
+var datat = [{
+type: 'table',
+columnwidth: [500,500,500],
+columnorder: [0,1,2],
+header: {
+  values: headerValues,
+  align: "center",
+  line: {width: 1, color: 'rgb(50, 50, 50)'},
+  fill: {color: ['rgb(235, 100, 230)']},
+  font: {family: "Arial", size: 11, color: "white"}
+},
+cells: {
+  values: cellValues,
+  align: ["left","right", "right"],
+  line: {color: "black", width: 1},
+  fill: {color: ['rgba(228, 222, 249, 0.65)','rgb(235, 193, 238)', 'rgba(228, 222, 249, 0.65)']},
+  font: {family: "Arial", size: 11, color: ["black"]}
+}
+}];
+
+var layoutt = {
+title: "1851 UK Census"
+};
+
+Plotly.plot('chart3', datat, layoutt);
+
+var trace1 = {
+        x: unpack(rows, 'age'),
+        y: unpack(rows, 'male'),
+        name: 'Male population',
+        type: 'bar'
+    };
+  
+  var trace2 = {
+        x: unpack(rows, 'age'),
+        y: unpack(rows, 'female'),
+        name: 'Female population',
+        type: 'bar'
+  };
+
+  var data = [trace1];
+  var layout = {
+    title: '1851 UK Male Population Distribution',
+    xaxis: {
+      title: 'Age range'
+    },
+    yaxis: {
+      title: 'Population #'
+    }
+  };
+  var data1 = [trace2];
+  var layout1 = {
+    title: '1851 UK Female Population Distribution',
+    xaxis: {
+      title: 'Age range'
+    },
+    yaxis: {
+      title: 'Population #'
+    }
+  };
+
+  var data2 = [{
+    values: unpack(rows, 'male'),
+    labels: unpack(rows, 'age'),
+    type: 'pie'
+  }];
+
+  var layout2 = {
+    height: 400,
+    width: 700,
+    title: '1851 UK Male Population Distribution'
+  };
+
+   var data3 = [{
+    values: unpack(rows, 'female'),
+    labels: unpack(rows, 'age'),
+    type: 'pie'
+  }];
+
+  var layout3 = {
+    height: 400,
+    title: '1851 UK Female Population Distribution'
+  };
+
+  var datap = [{
+    values: [8186432, 8552261],
+    labels: ['Male', 'Female'],
+    type: 'pie'
+  }];
+
+  var layoutp = {
+    height: 400,
+    title: '1851 UK Population'
+  };
+
+  Plotly.newPlot('plot3', datap, layoutp)
+  Plotly.newPlot('plot4', data, layout);
+  Plotly.newPlot('plot5', data1, layout1);
+  Plotly.newPlot('plot6', data2, layout2);
+  Plotly.newPlot('plot7', data3, layout3);
   });
 
   function myFunction() {
     var popup = document.getElementById("myPopup");
     popup.classList.toggle("show");
-  }
+  };
 </script>
 </body>
